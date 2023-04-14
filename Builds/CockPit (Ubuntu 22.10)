@@ -1,0 +1,57 @@
+sudo apt-get install cockpit -y
+sudo systemctl enable --now cockpit.socket
+sudo apt-get install podman cockpit-podman -y
+sudo systemctl enable --now podman
+
+sudo ufw allow from <Jump Host IP> to any port 9090
+
+sudo useradd <CockPit Service Account>
+sudo mkdir /home/<CockPit Service Account>
+sudo mkdir /home/<CockPit Service Account>/.ssh
+sudo chmod 700 /home/<CockPit Service Account>/.ssh
+
+sudo passwd <CockPit Service Account>
+sudo visudo
+#Add the following to the bottom of the file
+<CockPit Service Account>    ALL=(ALL) ALL
+
+#Log in as <CockPit Service Account> and run:
+chsh
+#Enter your password
+/bin/bash
+#Now log out and continue
+
+#Authenticate with SSH sudo account: https://<CockPit Server>:9090
+#Turn on administrative access mode using the above authentication credentials
+#Navigate to Accounts and then the console sudo user. Disallow interactive password.
+
+sudo vim /etc/netplan/01-netcfg.yaml
+#Add the below just below (and inline with) version: 2
+renderer: NetworkManager
+#Then run:
+sudo netplan apply
+
+#Ensure <CockPit Service Account> is in the ssh AllowUsers list
+
+
+#Member Server
+--------------
+
+sudo useradd <CockPit Service Account>
+sudo mkdir /home/<CockPit Service Account>
+sudo mkdir /home/<CockPit Service Account>/.ssh
+sudo chmod 700 /home/<CockPit Service Account>/.ssh
+
+sudo passwd <CockPit Service Account>
+sudo visudo #Add the following to the bottom of the file
+<CockPit Service Account>    ALL=(ALL) ALL
+
+sudo apt install cockpit -y
+sudo systemctl enable --now cockpit.socket
+sudo ufw allow from <CockPit Server>  to any port 22
+
+sudo vim /etc/netplan/01-netcfg.yaml
+#Add the below just below (and inline with) version: 2
+renderer: NetworkManager
+#Then run:
+sudo netplan apply
